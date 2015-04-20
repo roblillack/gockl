@@ -5,7 +5,8 @@ gockl is a minimal XML processor for Go that does not to fuck with your markup.
 
 #### Usage ####
 
-Transparently “convert” string `input` to `output`:
+Transparently “convert” string `input` to `output` and log names for all element
+tokens:
 
 	buf := bytes.Buffer{}
 	z := New(input)
@@ -16,6 +17,9 @@ Transparently “convert” string `input` to `output`:
 			break
 		}
 
+		if el, ok := t.(gockl.ElementToken); ok {
+			log.Println(el.Name())
+		}
 		buf.WriteString(t.Raw())
 	}
 
