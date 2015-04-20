@@ -9,7 +9,7 @@ Transparently “convert” string `input` to `output` and log names for all ele
 tokens:
 
 	buf := bytes.Buffer{}
-	z := New(input)
+	z := gockl.New(input)
 
 	for {
 		t, err := z.Next()
@@ -24,6 +24,13 @@ tokens:
 	}
 
 	output := buf.String()
+
+#### Why? ####
+
+* To ease creating XML document diffs, if only minor changes to a document are done
+* To not run into over-escaping of text data in `encoding/xml`: https://github.com/golang/go/issues/9204
+* To not run into broken namespace handling: https://github.com/golang/go/issues/9519
+* To not run into errors when parsing DOCTYPEs with subsets: https://github.com/golang/go/issues/10158
 
 #### License ####
 
