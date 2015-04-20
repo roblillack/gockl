@@ -78,9 +78,7 @@ type Tokenizer struct {
 }
 
 func New(input string) *Tokenizer {
-	return &Tokenizer{
-		Input: strings.Replace(input, "\r\n", "\n", -1),
-	}
+	return &Tokenizer{Input: input}
 }
 
 func (me *Tokenizer) shift(end string) string {
