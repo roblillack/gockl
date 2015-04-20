@@ -127,7 +127,7 @@ func (me *Tokenizer) Next() (Token, error) {
 		default:
 			raw := me.shift(">")
 
-			if raw[len(raw)-2] == '/' {
+			if len(raw) >= 3 && raw[len(raw)-2] == '/' {
 				return StartEndElementToken(raw), nil
 			}
 
