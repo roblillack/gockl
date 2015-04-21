@@ -66,9 +66,9 @@ func (t EndElementToken) Name() string {
 	return string(t)[2 : len(t)-1]
 }
 
-type StartEndElementToken string
+type EmptyElementToken string
 
-func (t StartEndElementToken) Raw() string {
+func (t EmptyElementToken) Raw() string {
 	return string(t)
 }
 
@@ -135,7 +135,7 @@ func (me *Tokenizer) Next() (Token, error) {
 			raw := me.shift(">")
 
 			if len(raw) >= 3 && raw[len(raw)-2] == '/' {
-				return StartEndElementToken(raw), nil
+				return EmptyElementToken(raw), nil
 			}
 
 			return StartElementToken(raw), nil
