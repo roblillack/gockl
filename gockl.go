@@ -19,9 +19,9 @@ func (t TextToken) Raw() string {
 	return string(t)
 }
 
-type CharDataToken string
+type CDATAToken string
 
-func (t CharDataToken) Raw() string {
+func (t CDATAToken) Raw() string {
 	return string(t)
 }
 
@@ -103,6 +103,10 @@ func (me *Tokenizer) shiftUntil(next string) string {
 	return r
 }
 
+func (me *Tokenizer) has(next string) bool {
+	return me.Position+len(next) <= len(me.Input) && me.Input[me.Position:me.Position+len(next)] == next
+}
+
 func (me *Tokenizer) Next() (Token, error) {
 	if me.Position >= len(me.Input) {
 		return nil, io.EOF
@@ -118,6 +122,9 @@ func (me *Tokenizer) Next() (Token, error) {
 		case '?':
 			return ProcInstToken(me.shift("?>")), nil
 		case '!':
+			if me.has("<![CDATA[") {
+				return CDATAToken(me.shift("]]>")), nil
+			}
 			if me.Input[me.Position+2:me.Position+4] != "--" {
 				goto dunno
 			}
