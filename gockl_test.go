@@ -37,7 +37,7 @@ var documents map[string]DocumentInfo = map[string]DocumentInfo{
   </style>
   <rect width="1920" height="1080" class="test" fill="red"></rect>
   <defs>
-    <linearGradient id="SvgjsLinearGradient1070">
+    <linearGradient id="grad">
       <stop stop-color="white" offset="0"></stop>
       <stop stop-opacity="0" stop-color="white" offset="1"></stop>
     </linearGradient>
@@ -140,6 +140,7 @@ func Test_BrokenTextElement(t *testing.T) {
 	}
 }
 
+// I have a directory of ~15.000 XML files created using: find ~ -name '*.xml' -exec cp {} ./XML \;
 func Test_RealLifeFiles(t *testing.T) {
 	dir := "/Users/rob/dev/gockl/XML"
 	files, err := ioutil.ReadDir(dir)
