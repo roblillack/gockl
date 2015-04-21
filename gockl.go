@@ -122,13 +122,20 @@ func (me *Tokenizer) Next() (Token, error) {
 		case '?':
 			return ProcInstToken(me.shift("?>")), nil
 		case '!':
+			if me.has("<!--") {
+				return CommentToken(me.shift("-->")), nil
+			}
+
 			if me.has("<![CDATA[") {
 				return CDATAToken(me.shift("]]>")), nil
 			}
-			if me.Input[me.Position+2:me.Position+4] != "--" {
-				goto dunno
+
+			r := me.shift(">")
+			if strings.HasPrefix(r, "<!DOCTYPE") && strings.Contains(r, "[") {
+				r += me.shift("]") + me.shift(">")
 			}
-			return CommentToken(me.shift("-->")), nil
+
+			return DirectiveToken(r), nil
 		case '/':
 			return EndElementToken(me.shift(">")), nil
 		default:
