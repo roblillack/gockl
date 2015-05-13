@@ -166,3 +166,32 @@ func Test_RealLifeFiles(t *testing.T) {
 		//t.Logf("%d/%d files checked.", i+1, len(files))
 	}
 }
+
+func Test_Attributes(t *testing.T) {
+	svg := StartElementToken(`<svg xmlns="http://www.w3.org/2000/svg" version=1.1 width='100%' height='a + b' xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080" bla=blub bla>`)
+	attrs := []Attribute{
+		Attribute{"xmlns", "http://www.w3.org/2000/svg"},
+		Attribute{"version", "1.1"},
+		Attribute{"width", "100%"},
+		Attribute{"height", "a + b"},
+		Attribute{"xmlns:xlink", "http://www.w3.org/1999/xlink"},
+		Attribute{"viewBox", "0 0 1920 1080"},
+		Attribute{"bla", "blub"},
+		Attribute{"bla", ""},
+	}
+
+	result := svg.Attributes()
+	if len(result) != len(attrs) {
+		t.Error("Attribute count not matching")
+		t.Errorf("Expected: %v", attrs)
+		t.Errorf("Got: %v", result)
+	}
+
+	for i, a := range result {
+		if i >= len(attrs) {
+			t.Errorf("Unexpected attribute: %s", a)
+		} else if attrs[i] != a {
+			t.Errorf("Attributes not matching. Expected %s, got %s", attrs[i], a)
+		}
+	}
+}
