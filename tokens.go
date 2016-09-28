@@ -88,3 +88,11 @@ type EmptyElementToken string
 func (t EmptyElementToken) Raw() string {
 	return string(t)
 }
+
+func (t EmptyElementToken) Name() string {
+	return StartElementToken(t).Name()
+}
+
+func (t EmptyElementToken) Attributes() []Attribute {
+	return StartElementToken(t).Attributes()
+}
