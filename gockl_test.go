@@ -195,3 +195,28 @@ func Test_Attributes(t *testing.T) {
 		}
 	}
 }
+
+func Test_AttributesInEmptyElements(t *testing.T) {
+	svg := EmptyElementToken(`<circle cx="50" cy="25" r="20" fill="yellow" />`)
+	attrs := []Attribute{
+		Attribute{"cx", "50"},
+		Attribute{"cy", "25"},
+		Attribute{"r", "20"},
+		Attribute{"fill", "yellow"},
+	}
+
+	result := svg.Attributes()
+	if len(result) != len(attrs) {
+		t.Error("Attribute count not matching")
+		t.Errorf("Expected: %v", attrs)
+		t.Errorf("Got: %v", result)
+	}
+
+	for i, a := range result {
+		if i >= len(attrs) {
+			t.Errorf("Unexpected attribute: %s", a)
+		} else if attrs[i] != a {
+			t.Errorf("Attributes not matching. Expected %s, got %s", attrs[i], a)
+		}
+	}
+}

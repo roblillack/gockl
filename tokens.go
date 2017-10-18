@@ -94,5 +94,19 @@ func (t EmptyElementToken) Name() string {
 }
 
 func (t EmptyElementToken) Attributes() []Attribute {
-	return StartElementToken(t).Attributes()
+	list := []Attribute{}
+
+	z := &attributeTokenizer{Input: string(t)[1 : len(t)-2]}
+	// eat the element name
+	z.shiftUntilSpace()
+
+	for {
+		a, err := z.Next()
+		if err != nil {
+			break
+		}
+		list = append(list, a)
+	}
+
+	return list
 }
