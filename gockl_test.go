@@ -220,3 +220,37 @@ func Test_AttributesInEmptyElements(t *testing.T) {
 		}
 	}
 }
+
+func Test_CDATA(t *testing.T) {
+	doc := New(`<p><![CDATA[</p>]]><!-- </p> --></p>`)
+
+	if tok, err := doc.Next(); err != nil {
+		t.Error(err)
+	} else if start, ok := tok.(StartElementToken); !ok {
+		t.Errorf("Expected start element token, got: %s", start)
+	}
+
+	if tok, err := doc.Next(); err != nil {
+		t.Error(err)
+	} else if cdata, ok := tok.(CDATAToken); !ok {
+		t.Errorf("Expected CDATA token, got: %s", cdata)
+	} else if raw := cdata.Raw(); raw != `<![CDATA[</p>]]>` {
+		t.Errorf("Wrong content for CDATA token: %s", raw)
+	}
+
+	if tok, err := doc.Next(); err != nil {
+		t.Error(err)
+	} else if comment, ok := tok.(CommentToken); !ok {
+		t.Errorf("Expected end element token, got: %s", comment)
+	} else if raw := comment.Raw(); raw != `<!-- </p> -->` {
+		t.Errorf("Wrong content for end token: %s", raw)
+	}
+
+	if tok, err := doc.Next(); err != nil {
+		t.Error(err)
+	} else if end, ok := tok.(EndElementToken); !ok {
+		t.Errorf("Expected end element token, got: %s", end)
+	} else if raw := end.Raw(); raw != `</p>` {
+		t.Errorf("Wrong content for end token: %s", raw)
+	}
+}
