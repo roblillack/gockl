@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"path"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -205,6 +206,10 @@ func Test_AttributesInEmptyElements(t *testing.T) {
 		Attribute{"fill", "yellow"},
 	}
 
+	if "circle" != svg.Name() {
+		t.Error("No a circle")
+	}
+
 	result := svg.Attributes()
 	if len(result) != len(attrs) {
 		t.Error("Attribute count not matching")
@@ -217,6 +222,56 @@ func Test_AttributesInEmptyElements(t *testing.T) {
 			t.Errorf("Unexpected attribute: %s", a)
 		} else if attrs[i] != a {
 			t.Errorf("Attributes not matching. Expected %s, got %s", attrs[i], a)
+		}
+	}
+}
+
+func TestGettingAttributesByName(t *testing.T) {
+	type AttribTest struct {
+		Token         Token
+		Attributes    []Attribute
+		NonAttributes []string
+	}
+	testdata := []AttribTest{
+		AttribTest{
+			EmptyElementToken(`<circle cx="50" cy="25" r="20" fill="yellow" />`),
+			[]Attribute{
+				Attribute{Name: "cx", Content: "50"},
+				Attribute{Name: "R", Content: "20"},
+			},
+			[]string{"bla"},
+		},
+		AttribTest{
+			StartElementToken(`<group style="fill: none;" style="nope">`),
+			[]Attribute{
+				Attribute{Name: "style", Content: "fill: none;"},
+			},
+			[]string{"r"},
+		},
+	}
+
+	for _, i := range testdata {
+		tok, ok := i.Token.(StartOrEmptyElementToken)
+		if !ok {
+			t.FailNow()
+		}
+
+		for _, a := range i.Attributes {
+			for _, fn := range []func(string) string{
+				strings.ToLower,
+				strings.ToUpper,
+				func(x string) string { return x },
+			} {
+				name := fn(a.Name)
+				res, ok := tok.Attribute(name)
+				if !ok {
+					t.Errorf("Missing attribute %s in token %s", name, i.Token)
+					continue
+				}
+				if res != a.Content {
+					t.Errorf("Wrong attribute %s in token %s: Expected %s, got %s", name, i.Token, a.Content, res)
+				}
+			}
 		}
 	}
 }

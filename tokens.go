@@ -9,16 +9,27 @@ type Token interface {
 }
 
 type ElementToken interface {
+	Token
 	Name() string
 }
 
+type StartOrEmptyElementToken interface {
+	ElementToken
+	Attributes() []Attribute
+	Attribute(name string) (string, bool)
+}
+
 type TextToken string
+
+var _ Token = TextToken("")
 
 func (t TextToken) Raw() string {
 	return string(t)
 }
 
 type CDATAToken string
+
+var _ Token = CDATAToken("")
 
 func (t CDATAToken) Raw() string {
 	return string(t)
@@ -32,17 +43,23 @@ func (t CommentToken) Raw() string {
 
 type DirectiveToken string
 
+var _ Token = DirectiveToken("")
+
 func (t DirectiveToken) Raw() string {
 	return string(t)
 }
 
 type ProcInstToken string
 
+var _ Token = ProcInstToken("")
+
 func (t ProcInstToken) Raw() string {
 	return string(t)
 }
 
 type StartElementToken string
+
+var _ StartOrEmptyElementToken = StartElementToken("")
 
 func (t StartElementToken) Raw() string {
 	return string(t)
@@ -56,24 +73,16 @@ func (t StartElementToken) Name() string {
 }
 
 func (t StartElementToken) Attributes() []Attribute {
-	list := []Attribute{}
+	return getAttributes(string(t)[1 : len(t)-1])
+}
 
-	z := &attributeTokenizer{Input: string(t)[1 : len(t)-1]}
-	// eat the element name
-	z.shiftUntilSpace()
-
-	for {
-		a, err := z.Next()
-		if err != nil {
-			break
-		}
-		list = append(list, a)
-	}
-
-	return list
+func (t StartElementToken) Attribute(name string) (string, bool) {
+	return getAttribute(string(t)[1:len(t)-1], name)
 }
 
 type EndElementToken string
+
+var _ EndElementToken = EndElementToken("")
 
 func (t EndElementToken) Raw() string {
 	return string(t)
@@ -85,6 +94,8 @@ func (t EndElementToken) Name() string {
 
 type EmptyElementToken string
 
+var _ StartOrEmptyElementToken = EmptyElementToken("")
+
 func (t EmptyElementToken) Raw() string {
 	return string(t)
 }
@@ -94,19 +105,9 @@ func (t EmptyElementToken) Name() string {
 }
 
 func (t EmptyElementToken) Attributes() []Attribute {
-	list := []Attribute{}
+	return getAttributes(string(t)[1 : len(t)-2])
+}
 
-	z := &attributeTokenizer{Input: string(t)[1 : len(t)-2]}
-	// eat the element name
-	z.shiftUntilSpace()
-
-	for {
-		a, err := z.Next()
-		if err != nil {
-			break
-		}
-		list = append(list, a)
-	}
-
-	return list
+func (t EmptyElementToken) Attribute(name string) (string, bool) {
+	return getAttribute(string(t)[1:len(t)-2], name)
 }

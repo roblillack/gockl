@@ -97,3 +97,41 @@ func (me *attributeTokenizer) Next() (Attribute, error) {
 
 	return Attribute{key, me.shiftValue()}, nil
 }
+
+func getAttribute(rawInput, name string) (string, bool) {
+	name = strings.ToLower(name)
+
+	z := &attributeTokenizer{Input: rawInput}
+	// eat the element name
+	z.shiftUntilSpace()
+
+	for {
+		a, err := z.Next()
+		if err != nil {
+			break
+		}
+		if strings.ToLower(a.Name) == name {
+			return a.Content, true
+		}
+	}
+
+	return "", false
+}
+
+func getAttributes(rawInput string) []Attribute {
+	list := []Attribute{}
+
+	z := &attributeTokenizer{Input: rawInput}
+	// eat the element name
+	z.shiftUntilSpace()
+
+	for {
+		a, err := z.Next()
+		if err != nil {
+			break
+		}
+		list = append(list, a)
+	}
+
+	return list
+}
