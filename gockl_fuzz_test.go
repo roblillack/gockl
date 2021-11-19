@@ -106,13 +106,10 @@ func encode(tokens []Token) (string, error) {
 	return b.String(), nil
 }
 
-func FuzzParsing(f *testing.F) {
-	for _, i := range seed {
-		f.Add(i)
-	}
-
+func addFixtures(f *testing.F) {
 	files, err := ioutil.ReadDir(filepath.Join("testdata", "xml"))
 	if err != nil {
+		f.Logf("Error opening %s: %s", filepath.Join("testdata", "xml"), err)
 		return
 	}
 
@@ -125,6 +122,14 @@ func FuzzParsing(f *testing.F) {
 
 		f.Add(string(raw))
 	}
+}
+
+func FuzzParsing(f *testing.F) {
+	for _, i := range seed {
+		f.Add(i)
+	}
+
+	addFixtures(f)
 
 	f.Fuzz(func(t *testing.T, documentContent string) {
 		if err := process(documentContent); err != nil {
@@ -137,6 +142,9 @@ func FuzzRoundtrip(f *testing.F) {
 	for _, i := range seed {
 		f.Add(i)
 	}
+
+	addFixtures(f)
+
 	f.Fuzz(func(t *testing.T, document1 string) {
 		tokens1, err := decode(document1)
 		if err != nil {
