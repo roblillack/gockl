@@ -27,10 +27,12 @@ func (me *Tokenizer) shift(end string) string {
 }
 
 func (me *Tokenizer) shiftUntil(next string) string {
-	if pos := strings.Index(me.Input[me.Position+1:], next); pos > -1 {
-		r := me.Input[me.Position : me.Position+pos+1]
-		me.Position += pos + 1
-		return r
+	if me.Position < len(me.Input) {
+		if pos := strings.Index(me.Input[me.Position+1:], next); pos > -1 {
+			r := me.Input[me.Position : me.Position+pos+1]
+			me.Position += pos + 1
+			return r
+		}
 	}
 
 	r := me.Input[me.Position:]

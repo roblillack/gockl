@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"path"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -18,7 +18,7 @@ type DocumentInfo struct {
 
 var documents map[string]DocumentInfo = map[string]DocumentInfo{
 	// taken from https://github.com/golang/go/issues/10158
-	"doctype subset": DocumentInfo{
+	"doctype subset": {
 		Data: `<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE doc [
     <!ELEMENT doc ANY>
@@ -27,7 +27,7 @@ var documents map[string]DocumentInfo = map[string]DocumentInfo{
 </doc>`,
 		ElementNames: []string{"doc", "doc"},
 	},
-	"simple-svg": DocumentInfo{
+	"simple-svg": {
 		Data: `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
   <style>
@@ -143,14 +143,13 @@ func Test_BrokenTextElement(t *testing.T) {
 
 // I have a directory of ~15.000 XML files created using: find ~ -name '*.xml' -exec cp {} ./XML \;
 func Test_RealLifeFiles(t *testing.T) {
-	dir := "/Users/rob/dev/gockl/XML"
-	files, err := ioutil.ReadDir(dir)
+	files, err := ioutil.ReadDir(filepath.Join("testdata", "xml"))
 	if err != nil {
 		return
 	}
 
 	for _, fi := range files {
-		raw, err := ioutil.ReadFile(path.Join(dir, fi.Name()))
+		raw, err := ioutil.ReadFile(filepath.Join("testdata", "xml", fi.Name()))
 		if err != nil {
 			t.Logf("Error reading %s: %s", fi.Name(), err)
 			continue
@@ -158,7 +157,7 @@ func Test_RealLifeFiles(t *testing.T) {
 
 		input := string(raw)
 		if output := passthrough(input); output != input {
-			outfile := fmt.Sprintf("%s.tmp", path.Join(dir, fi.Name()))
+			outfile := fmt.Sprintf("%s.tmp", filepath.Join("testdata", "xml", fi.Name()))
 			t.Errorf("Error processing document '%s', writing output to %s for comparing to ", fi.Name(), outfile)
 			ioutil.WriteFile(outfile, []byte(output), 0644)
 			return
