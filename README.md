@@ -1,4 +1,8 @@
-# gockl [![Build Status](https://secure.travis-ci.org/roblillack/gockl.png?branch=master)](http://travis-ci.org/roblillack/gockl) [![GoDoc](http://godoc.org/github.com/roblillack/gockl?status.png)](http://godoc.org/github.com/roblillack/gockl) [![Coverage Status](https://coveralls.io/repos/github/roblillack/gockl/badge.svg)](https://coveralls.io/github/roblillack/gockl)
+gockl [![Build Status](https://secure.travis-ci.org/roblillack/gockl.png?branch=master)](http://travis-ci.org/roblillack/gockl)
+[![GoDoc](http://godoc.org/github.com/roblillack/gockl?status.png)](http://godoc.org/github.com/roblillack/gockl)
+[![Coverage Status](https://coveralls.io/repos/github/roblillack/gockl/badge.svg)](https://coveralls.io/github/roblillack/gockl)
+[![Go Report Card](https://goreportcard.com/badge/github.com/roblillack/tack)](https://goreportcard.com/report/github.com/roblillack/tack)
+=======
 
 gockl is a minimal XML processor for Go that does not to fuck with your markup.
 
@@ -9,22 +13,24 @@ Supported & tested Go versions are: 1.2 – 1.18.
 Transparently decode XML string `input` and re-encode to string `output` without affecting
 the underlying structure of the original file:
 
-    buf := bytes.Buffer{}
-    z := gockl.New(input)
+```go
+buf := bytes.Buffer{}
+z := gockl.New(input)
 
-    for {
-    	t, err := z.Next()
-    	if err != nil {
-    		break
-    	}
+for {
+	t, err := z.Next()
+	if err != nil {
+		break
+	}
 
-    	if el, ok := t.(gockl.ElementToken); ok {
-    		log.Println(el.Name())
-    	}
-    	buf.WriteString(t.Raw())
-    }
+	if el, ok := t.(gockl.ElementToken); ok {
+		log.Println(el.Name())
+	}
+	buf.WriteString(t.Raw())
+}
 
-    output := buf.String()
+output := buf.String()
+```
 
 #### Why?
 
