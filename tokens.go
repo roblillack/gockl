@@ -73,6 +73,10 @@ func (t StartElementToken) Name() string {
 }
 
 func (t StartElementToken) Attributes() []Attribute {
+	if len(t) <= 1 {
+		return []Attribute{}
+	}
+
 	return getAttributes(string(t)[1 : len(t)-1])
 }
 
@@ -89,6 +93,10 @@ func (t EndElementToken) Raw() string {
 }
 
 func (t EndElementToken) Name() string {
+	if len(t) <= 2 {
+		return ""
+	}
+
 	return string(t)[2 : len(t)-1]
 }
 

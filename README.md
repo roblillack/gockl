@@ -6,9 +6,9 @@ gockl [![Build Status](https://secure.travis-ci.org/roblillack/gockl.png?branch=
 
 gockl is a minimal XML processor for Go that does not to fuck with your markup.
 
-Supported & tested Go versions are: 1.2 – 1.16.
+Supported & tested Go versions are: 1.2 – 1.18.
 
-#### Usage ####
+#### Usage
 
 Transparently decode XML string `input` and re-encode to string `output` without affecting
 the underlying structure of the original file:
@@ -32,13 +32,13 @@ for {
 output := buf.String()
 ```
 
-#### Why? ####
+#### Why?
 
-* To ease creating XML document diffs, if only minor changes to a document are done
-* To not run into over-escaping of text data in `encoding/xml`: https://github.com/golang/go/issues/9204
-* To not run into broken namespace handling: https://github.com/golang/go/issues/9519
-* To not run into errors when parsing DOCTYPEs with subsets: https://github.com/golang/go/issues/10158
+- To ease creating XML document diffs, if only minor changes to a document are done
+- To not run into over-escaping of text data in `encoding/xml`: https://github.com/golang/go/issues/9204
+- To not run into broken namespace handling: https://github.com/golang/go/issues/9519
+- To not run into errors when parsing DOCTYPEs with subsets: https://github.com/golang/go/issues/10158
 
-#### License ####
+#### License
 
 [MIT/X11](https://github.com/roblillack/gockl/blob/master/LICENSE.txt).
