@@ -27,6 +27,18 @@ var documents map[string]DocumentInfo = map[string]DocumentInfo{
 </doc>`,
 		ElementNames: []string{"doc", "doc"},
 	},
+	"empty start": {
+		Data:         `<<a`,
+		ElementNames: []string{},
+	},
+	"empty end": {
+		Data:         `</<a`,
+		ElementNames: []string{""},
+	},
+	"empty doctype": {
+		Data:         `<!DOCTYPE[`,
+		ElementNames: []string{},
+	},
 	"simple-svg": {
 		Data: `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
