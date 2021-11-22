@@ -182,14 +182,14 @@ func Test_RealLifeFiles(t *testing.T) {
 func Test_Attributes(t *testing.T) {
 	svg := StartElementToken(`<svg xmlns="http://www.w3.org/2000/svg" version=1.1 width='100%' height='a + b' xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080" bla=blub bla>`)
 	attrs := []Attribute{
-		Attribute{"xmlns", "http://www.w3.org/2000/svg"},
-		Attribute{"version", "1.1"},
-		Attribute{"width", "100%"},
-		Attribute{"height", "a + b"},
-		Attribute{"xmlns:xlink", "http://www.w3.org/1999/xlink"},
-		Attribute{"viewBox", "0 0 1920 1080"},
-		Attribute{"bla", "blub"},
-		Attribute{"bla", ""},
+		{"xmlns", "http://www.w3.org/2000/svg"},
+		{"version", "1.1"},
+		{"width", "100%"},
+		{"height", "a + b"},
+		{"xmlns:xlink", "http://www.w3.org/1999/xlink"},
+		{"viewBox", "0 0 1920 1080"},
+		{"bla", "blub"},
+		{"bla", ""},
 	}
 
 	result := svg.Attributes()
@@ -211,10 +211,10 @@ func Test_Attributes(t *testing.T) {
 func Test_AttributesInEmptyElements(t *testing.T) {
 	svg := EmptyElementToken(`<circle cx="50" cy="25" r="20" fill="yellow" />`)
 	attrs := []Attribute{
-		Attribute{"cx", "50"},
-		Attribute{"cy", "25"},
-		Attribute{"r", "20"},
-		Attribute{"fill", "yellow"},
+		{"cx", "50"},
+		{"cy", "25"},
+		{"r", "20"},
+		{"fill", "yellow"},
 	}
 
 	if "circle" != svg.Name() {
@@ -244,18 +244,18 @@ func TestGettingAttributesByName(t *testing.T) {
 		NonAttributes []string
 	}
 	testdata := []AttribTest{
-		AttribTest{
+		{
 			EmptyElementToken(`<circle cx="50" cy="25" r="20" fill="yellow" />`),
 			[]Attribute{
-				Attribute{Name: "cx", Content: "50"},
-				Attribute{Name: "R", Content: "20"},
+				{Name: "cx", Content: "50"},
+				{Name: "R", Content: "20"},
 			},
 			[]string{"bla"},
 		},
-		AttribTest{
+		{
 			StartElementToken(`<group style="fill: none;" style="nope">`),
 			[]Attribute{
-				Attribute{Name: "style", Content: "fill: none;"},
+				{Name: "style", Content: "fill: none;"},
 			},
 			[]string{"r"},
 		},
