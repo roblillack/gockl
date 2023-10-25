@@ -6,7 +6,7 @@ gockl [![Build Status](https://secure.travis-ci.org/roblillack/gockl.png?branch=
 
 gockl is a minimal XML processor for Go that does not to fuck with your markup.
 
-Supported & tested Go versions are: 1.2 – 1.18.
+Supported & tested Go versions are: 1.2 – 1.21.
 
 #### Usage
 
