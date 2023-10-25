@@ -320,3 +320,51 @@ func Test_CDATA(t *testing.T) {
 		t.Errorf("Wrong content for end token: %s", raw)
 	}
 }
+
+func getAllTokens(data string) []Token {
+	r := []Token{}
+	z := New(data)
+
+	for {
+		t, err := z.Next()
+		if err != nil {
+			break
+		}
+
+		r = append(r, t)
+	}
+
+	return r
+}
+
+// Tests taken from https://mionskowski.pl/posts/unmasking-go-html-parser-bug/
+// we should add differential fuzzing to our tests, too
+func TestParsingFringeCases(t *testing.T) {
+	type docInfo struct {
+		Data   string
+		Tokens []Token
+	}
+	var tests map[string]docInfo = map[string]docInfo{
+		"dangling =": {
+			Data:   `<script =">alert(1)</script>`,
+			Tokens: []Token{StartElementToken(`<script =">`), TextToken(`alert(1)`), EndElementToken(`</script>`)},
+		},
+		"= after /": {
+			Data:   `<A/=">`,
+			Tokens: []Token{StartElementToken(`<A/=">`)},
+		},
+	}
+
+	for name, info := range tests {
+		tokens := getAllTokens(info.Data)
+		for pos, expected := range info.Tokens {
+			if pos >= len(tokens) {
+				t.Errorf("Token pos %d not existing for document %s", pos, name)
+			} else if actual := tokens[pos]; reflect.TypeOf(actual) != reflect.TypeOf(expected) {
+				t.Errorf("Token type not matching at pos %d for input data `%s`: %s (actual) != %s (expected)", pos, name, reflect.TypeOf(actual), reflect.TypeOf(expected))
+			} else if actual := tokens[pos]; actual.Raw() != expected.Raw() {
+				t.Errorf("Token content not matching at pos %d for input data `%s`: %s (actual) != %s (expected)", pos, name, actual, expected)
+			}
+		}
+	}
+}
