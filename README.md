@@ -1,12 +1,12 @@
-gockl [![Build Status](https://secure.travis-ci.org/roblillack/gockl.png?branch=master)](http://travis-ci.org/roblillack/gockl)
-[![GoDoc](http://godoc.org/github.com/roblillack/gockl?status.png)](http://godoc.org/github.com/roblillack/gockl)
+gockl [![Build Status](https://api.travis-ci.com/roblillack/gockl.svg?branch=master)](https://app.travis-ci.com/github/roblillack/gockl)
+[![GoDoc](https://pkg.go.dev/badge/github.com/roblillack/gockl)](https://pkg.go.dev/github.com/roblillack/gockl)
 [![Coverage Status](https://coveralls.io/repos/github/roblillack/gockl/badge.svg)](https://coveralls.io/github/roblillack/gockl)
 [![Go Report Card](https://goreportcard.com/badge/github.com/roblillack/gockl)](https://goreportcard.com/report/github.com/roblillack/gockl)
 =======
 
 gockl is a minimal XML processor for Go that does not to fuck with your markup.
 
-Supported & tested Go versions are: 1.2 – 1.21.
+Supported & tested Go versions are: 1.2 – 1.23.
 
 #### Usage
 
