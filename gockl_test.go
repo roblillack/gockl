@@ -135,6 +135,81 @@ func Test_BrokenStartElement(t *testing.T) {
 	}
 }
 
+func TestGreaterSymbol(t *testing.T) {
+	for input, content := range map[string]string{
+		"<style>h1 > i { color: red !important; }</style>":                 `h1 > i { color: red !important; }`,
+		"<button email='Someone <hello@example.example>'>Contact</button>": "Contact",
+	} {
+
+		decoder := New(input)
+		tok, err := decoder.Next()
+		if err != nil {
+			t.Errorf("Error while getting token from %s: %s", input, err)
+		}
+
+		if _, ok := tok.(StartElementToken); !ok {
+			t.Errorf("Not a start element token: %s, %s", input, reflect.TypeOf(tok))
+		}
+
+		contentTok, err := decoder.Next()
+		if err != nil {
+			t.Errorf("Error while getting token from %s: %s", input, err)
+		}
+
+		if _, ok := contentTok.(TextToken); !ok {
+			t.Errorf("Not a text token: %s, %s", input, reflect.TypeOf(contentTok))
+		}
+
+		if contentTok.Raw() != content {
+			t.Errorf("Token text not matching: %s (expected) != %s (actual)", content, contentTok.Raw())
+		}
+
+		// skip end element
+		_, _ = decoder.Next()
+
+		if next, err := decoder.Next(); next != nil || err != io.EOF {
+			t.Errorf("Wanted EOF, got: '%s'/%s", next, err)
+		}
+	}
+}
+
+func TestNewlineInElements(t *testing.T) {
+	for input, typ := range map[string]rune{
+		"<a\nb>":                            '<',
+		"<a\nb\n>":                          '<',
+		"<\na\nb=c\n>":                      '<',
+		"</a>":                              '>',
+		"</\na>":                            '>',
+		"</a\n>":                            '>',
+		"<a\n  name='b'\n  content='c'\n/>": '/',
+	} {
+		decoder := New(input)
+		tok, err := decoder.Next()
+		if err != nil {
+			t.Errorf("Error while getting token from %s: %s", input, err)
+		}
+		if typ == '<' {
+			if _, ok := tok.(StartElementToken); !ok {
+				t.Errorf("Not a start element token: %s, %s", input, reflect.TypeOf(tok))
+			}
+		} else if typ == '>' {
+			if _, ok := tok.(EndElementToken); !ok {
+				t.Errorf("Not an end element token: %s, %s", input, reflect.TypeOf(tok))
+			}
+		} else if typ == '/' {
+			if _, ok := tok.(EmptyElementToken); !ok {
+				t.Errorf("Not an empty element token: %s, %s", input, reflect.TypeOf(tok))
+			}
+		}
+		if tok.Raw() != input {
+			t.Errorf("Token text not matching: %s (expected) != %s (actual)", input, tok.Raw())
+		}
+		if next, err := decoder.Next(); next != nil || err != io.EOF {
+			t.Errorf("Wanted EOF, got: '%s'/%s", next, err)
+		}
+	}
+}
+
 func Test_BrokenTextElement(t *testing.T) {
 	input := "/asdkjlh"
 	decoder := New(input)

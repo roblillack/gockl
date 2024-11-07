@@ -23,12 +23,79 @@ func (me *Tokenizer) shift(end string) string {
 		return r
 	}
 
-	return me.shiftUntil("<")
+	return me.shiftUntil('<')
 }
 
-func (me *Tokenizer) shiftUntil(next string) string {
+func (me *Tokenizer) shiftToTagEnd() string {
+	type state uint8
+	const (
+		tagname     state = iota // we're in the name of the tag still
+		tagcontent               // past the name, looking for attributes or the end of the tag
+		attribname               // ok, started the attribute name
+		attribvalue              // started an attribute value
+		doublequote              // inside a double quoted attribute value
+		singlequote              // inside a single quoted attribute value
+	)
+
+	var s state = tagname
+	pos := me.Position
+	len := len(me.Input)
+	for i := pos + 1; i < len; i++ {
+		curr := me.Input[i]
+		if s == doublequote {
+			if curr == '"' {
+				s = tagname
+			}
+			continue
+		} else if s == singlequote {
+			if curr == '\'' {
+				s = tagname
+			}
+			continue
+		}
+
+		// tagname, tagcontent, attribname, attribvalue here
+
+		switch curr {
+		case ' ', '\t', '\r', '\n':
+			if s == tagname {
+				s = tagcontent
+			} else if s == attribvalue {
+				s = tagcontent
+			}
+		case '=':
+			if s == attribname {
+				s = attribvalue
+			}
+		case '<':
+			me.Position = i
+			return me.Input[pos:i]
+		case '>':
+			me.Position = i + 1
+			return me.Input[pos : i+1]
+		case '"':
+			if s == attribvalue {
+				s = doublequote
+			}
+		case '\'':
+			if s == attribvalue {
+				s = singlequote
+			}
+		default:
+			if s == tagcontent {
+				s = attribname
+			}
+		}
+	}
+
+	// eof
+	me.Position = len
+	return me.Input[pos:]
+}
+
+func (me *Tokenizer) shiftUntil(next rune) string {
 	if me.Position < len(me.Input) {
-		if pos := strings.Index(me.Input[me.Position+1:], next); pos > -1 {
+		if pos := strings.IndexRune(me.Input[me.Position+1:], next); pos > -1 {
 			r := me.Input[me.Position : me.Position+pos+1]
 			me.Position += pos + 1
 			return r
@@ -76,7 +143,7 @@ func (me *Tokenizer) Next() (Token, error) {
 		case '/':
 			return EndElementToken(me.shift(">")), nil
 		default:
-			raw := me.shift(">")
+			raw := me.shiftToTagEnd()
 
 			if len(raw) >= 3 && raw[len(raw)-2] == '/' {
 				return EmptyElementToken(raw), nil
@@ -88,5 +155,5 @@ func (me *Tokenizer) Next() (Token, error) {
 
 dunno:
 
-	return TextToken(me.shiftUntil("<")), nil
+	return TextToken(me.shiftUntil('<')), nil
 }
